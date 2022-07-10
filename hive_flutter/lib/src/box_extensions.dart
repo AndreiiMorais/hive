@@ -9,6 +9,29 @@ extension BoxX<T> on Box<T> {
   /// specified keys notify the listeners.
   ValueListenable<Box<T>> listenable({List<dynamic>? keys}) =>
       _BoxListenable(this, keys?.toSet());
+
+  Future<List<String>> getAllKeys() async {
+    return keys
+        .cast<String>()
+        .map((key) => key)
+        .map(Uri.decodeComponent)
+        .toList();
+  }
+
+  Future<Map<String, T>> getAllValues() async {
+    return toMap()
+        .map((k, v) => MapEntry(Uri.decodeComponent(k.toString()), v));
+  }
+
+  Future<List<T?>> getAll(
+    List<String> keys,
+  ) async {
+    final values = <T?>[];
+    for (var key in keys) {
+      values.add(get(key));
+    }
+    return values;
+  }
 }
 
 /// Flutter extensions for lazy boxes.
@@ -20,6 +43,24 @@ extension LazyBoxX<T> on LazyBox<T> {
   /// specified keys notify the listeners.
   ValueListenable<LazyBox<T>> listenable({List<dynamic>? keys}) =>
       _BoxListenable(this, keys?.toSet());
+
+  Future<List<String>> getAllKeys() async {
+    return keys
+        .cast<String>()
+        .map((key) => key)
+        .map(Uri.decodeComponent)
+        .toList();
+  }
+
+  Future<List<T?>> getAll(
+    List<String> keys,
+  ) async {
+    final values = <T?>[];
+    for (var key in keys) {
+      values.add(await get(key));
+    }
+    return values;
+  }
 }
 
 class _BoxListenable<T, B extends BoxBase<T>> extends ValueListenable<B> {
